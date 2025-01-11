@@ -1,9 +1,11 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
+#include <iomanip>
+
 using namespace std;
 
-struct eq {
+struct eq { //rational number struct - errors get accumulated during compounding
     double w;
     double b;
     eq() : w(0), b(0) {}
@@ -15,9 +17,10 @@ struct eq {
         currEq.b = b * other.w + other.b;
         return currEq;
     }
+
     eq wrapI(eq other) {
         eq currEq;
-        currEq.b = (b - other.b) / other.w;
+        currEq.b = (b - other.b) / other.w; //
         currEq.w = w/other.w;
         return currEq;
     }
@@ -53,7 +56,6 @@ pair<string, eq> down(string currUnit) {
 
 int main() {
     string line;
-    string out = "";
 
     while (getline(cin, line)) {
         istringstream ss(line);
@@ -69,7 +71,7 @@ int main() {
 
             bias *= 1-2*(addop == '-');
 
-            if (!parents.count(lunit) && !parents.count(runit)) { //
+            if (!parents.count(lunit) && !parents.count(runit)) {
                 parents[lunit] = {lunit, eq(1, 0)};
             }
 
@@ -89,22 +91,25 @@ int main() {
             string lunit, runit;
             char type, eql, ques;
             ss >> type >> amt >> lunit >> eql >> ques >> runit;
+            if (lunit == runit) {
+                cout << fixed << setprecision(8) << amt << "\n";
+                continue;
+            }
             if (!upMemo.count(lunit) || !downMemo.count(runit)) {
-                out += "Too hard!\n";
+                cout << "Too hard!\n";
                 continue;
             }
             auto [rootL, lCumUp]  = upMemo[lunit];
             auto [rootR, rCumDown]  = downMemo[runit];
             if (rootL != rootR) {
-                out += "Too hard!\n";
+                cout << "Too hard!\n";
             } else {
                 double LtoRoot = amt*lCumUp.w + lCumUp.b;
                 double ans = LtoRoot*rCumDown.w + rCumDown.b;
-                out += to_string(ans) + "\n";
+                cout << fixed << setprecision(8) << ans << "\n";
             }
         }
     }
-    cout << out;
     return 0;
 }
 

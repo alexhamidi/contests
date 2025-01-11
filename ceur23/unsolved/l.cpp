@@ -1,52 +1,66 @@
-//shouldsolve
 #include <iostream>
 #include <vector>
+#include <queue>
+#include <string>
 #include <algorithm>
 using namespace std;
+
+struct Edge {
+    int to;
+    int l;
+    int p;
+};
 
 int main() {
     int n, m, d, s;
     cin >> n >> m >> d >> s;
+    s--;
 
-    string A;  //all edge labels are substrings of A
+    string A;
     cin >> A;
 
-    vector<pair<string, int>> adj[n+1]; //target, substring
+    vector<vector<Edge>> adj(n);
     for (int i = 0; i < m; i++) {
-        int u, v, p, l;
+        int u, v, l, p;
         cin >> u >> v >> p >> l;
-        adj[u].push_back({A.substr(p-1, l), v});
+        u--, v--, p--;
+        adj[u].push_back({v, l, p});
     }
 
-    for (int i = 1; i <= n; i++) {
-        vector<pair<string, vector<int>>> wrk;
-        vector<pair<string, vector<int>>> cmp;
+    vector<vector<int>> bestPath(n);
+    bestPath[s].push_back(s);
 
-        wrk.push_back({"",{s}});
+    // BFS to calculate best paths
+    queue<int> q;
+    q.push(s);
 
-        while (!wrk.empty()) {
-            vector<pair<string, vector<int>>> cwrk;
-            for (auto [s, vec] : wrk) {
-                int ln = vec.back();
-                if (ln == i) {
-                    cmp.push_back({s, vec});
-                } else for (auto [newS, v] : adj[ln]) {
-                    vector<int> tmp = vec;
-                    tmp.push_back(v);
-                    cwrk.push_back({s+newS, tmp});
-                }
+    while (!q.empty()) {
+        int curr = q.front();
+        q.pop();
+
+        for (const auto& edge : adj[curr]) {
+            int next = edge.to;
+            vector<int> candidatePath = bestPath[curr];
+            candidatePath.push_back(next);
+
+            if (bestPath[next].empty() || lexicographical_compare(candidatePath.begin(), candidatePath.end(), bestPath[next].begin(), bestPath[next].end())) {
+                bestPath[next] = candidatePath;  // Update with the better path
+                q.push(next);
             }
-            wrk = cwrk;
         }
-        if (cmp.empty()) {
-            cout << 0;
-        } else {
-            auto [_, bestPath] = *min_element(cmp.begin(), cmp.end());
-            cout << bestPath.size() << " ";
-            for (auto node : bestPath) cout << node << " ";
-        }
-        cout << "\n";
     }
+
+    // Output results
+    for (int i = 0; i < n; i++) {
+        if (bestPath[i].empty()) {
+            cout << "0\n";
+        } else {
+            cout << bestPath[i].size() << " ";
+            for (int node : bestPath[i]) cout << node + 1 << " ";
+            cout << "\n";
+        }
+    }
+
     return 0;
 }
 

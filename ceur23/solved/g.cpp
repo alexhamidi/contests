@@ -4,14 +4,8 @@
 #include <iomanip>
 using namespace std;
 
-int sq(int a) {
-    return a * a;
-}
-
-double sq(double a) {
-    return a * a;
-}
-
+int sq(int a) {return a * a;}
+double sq(double a) {return a * a;}
 
 double getDistance(pair<double, double> p1, pair<double, double> p2) {
     auto [x1, y1] = p1;
@@ -19,15 +13,7 @@ double getDistance(pair<double, double> p1, pair<double, double> p2) {
     return sqrt(sq(x1-x2) + sq(y1-y2));
 }
 
-bool lineOnCircle(int x1, int y1, int x2, int y2, int xc, int yc, int r) {
-    int a = sq(x2-x1) + sq(y2-y1);
-    int b = 2 * (((x2 - x1) * (x1 - xc)) + ((y2 - y1) * (y1 - yc)));
-    int c = sq(x1-xc) + sq(y1-yc) - sq(r);
-    int disc = sq(b) - 4 * a * c;
-    return (disc >= 0);
-}
-
-const int BS_ITERS = 10000;
+const int BS_ITERS = 1000;
 
 int main() {
     int T;
